@@ -77,7 +77,7 @@ public class ActorsAndMovies {
         System.out.println("==================================================");
 
 
-        /* Question 7 :  Which actor has he played in the most movies? */
+        /* Question 7 :  Which actor has played in the most movies? */
         // actor that played in the greatest number of movies
         Map.Entry<Actor, Long> actorPerMovie =
                 movies.stream().flatMap(movie -> movie.actors().stream())
@@ -138,19 +138,29 @@ public class ActorsAndMovies {
 
         Comparator<Actor> cmpActor = Comparator.comparing(Actor::lastName).thenComparing(Actor::firstName);
 
-
         BiFunction<Movie, Actor, Stream<Map.Entry<Actor, Actor>>> ourMap =
                 (movie, actor1) -> movie.actors().stream()
                         .filter(actor2 -> cmpActor.compare(actor2, actor1) < 0)
                         .map(actor2 -> Map.entry(actor2, actor1));
 
-
-        Arrays.stream(ourMap.apply(movieWithGreatestNumberOfActors, mostSeenActor).toArray()).forEach((s) ->
-                System.out.println(s));
+        /*
+         * Arrays.stream(ourMap.apply(movieWithGreatestNumberOfActors, mostSeenActor).toArray()).forEach((s) ->
+         *       System.out.println(s));
+         */
 
         Function<Movie, Stream<Map.Entry<Actor, Actor>>> movieToActors =
                 movie -> movie.actors().stream()
                         .flatMap(actor -> ourMap.apply(movie, actor));
+
+
+        // Let's seen what's going on : (O_0)
+        Stream<Map.Entry<Actor, Actor>> entry5 =
+                movies.stream()
+                        .flatMap(movieToActors)
+                        .limit(4);
+
+        Arrays.stream(entry5.toArray()).forEach(System.out::println);
+        System.out.println("=======================================================");
 
 
         Map.Entry<Map.Entry<Actor, Actor>, Long> entry3 =
@@ -188,6 +198,7 @@ public class ActorsAndMovies {
         System.out.println("The two actors that played the most together:\n-" + oneOfTwoActors + "\n-" + theSecondActor);
         System.out.println("=======================================================");
 
+        /*Question 10 */
         // the two actors who played the most together for a year.
         Collector<Movie, ?, Map.Entry<Map.Entry<Actor, Actor>, Long>> collector2 =
                 Collectors.collectingAndThen(
