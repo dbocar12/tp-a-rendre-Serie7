@@ -205,6 +205,11 @@ public class ActorsAndMovies {
         entry5MovieToActors.forEach((s -> System.out.println("(" + s.getKey() + " , " + s.getValue() + ")")));
         System.out.println("=========================================================");
 
+        /* Question 9.f
+         * Deduce how many pairs of actors can be constructed from this file?
+         * How many unique pairs are there?
+         */
+
         // how many pairs of actors can be constructed from this file?
         long numberOfPairs =
                 movies.stream()
@@ -232,6 +237,9 @@ public class ActorsAndMovies {
                         .max(Map.Entry.comparingByValue())
                         .get();
 
+        /* Question 9.g
+         * Deduce which two actors have most often played together.
+         */
         // the two actors that played the most together
         Actor oneOfTwoActors = entry3.getKey().getKey();
         Actor theSecondActor = entry3.getKey().getValue();
