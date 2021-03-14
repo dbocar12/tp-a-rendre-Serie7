@@ -243,7 +243,9 @@ public class ActorsAndMovies {
         // the two actors that played the most together
         Actor oneOfTwoActors = entry3.getKey().getKey();
         Actor theSecondActor = entry3.getKey().getValue();
+        long numberOfTime = entry3.getValue();
         System.out.println("The two actors that played the most together:\n-" + oneOfTwoActors + "\n-" + theSecondActor);
+        System.out.println("They played " +numberOfTime+" times together.");
         System.out.println("=======================================================");
 
         /*Question 10 */
@@ -271,10 +273,12 @@ public class ActorsAndMovies {
                         .get();
 
         int year = entry4.getKey();
+        long numberOfTimeInOneYear = entry4.getValue().getValue();
         Actor actor1ForAYear = entry4.getValue().getKey().getKey();
         Actor actor2ForAYear = entry4.getValue().getKey().getValue();
         System.out.println(actor1ForAYear + " & " + actor2ForAYear +
                 "\nplayed the most together in " + year);
+        System.out.println("They played " +numberOfTimeInOneYear+" times together.");
         System.out.println("=======================================================");
 
     }
