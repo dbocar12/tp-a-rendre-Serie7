@@ -158,7 +158,7 @@ public class ActorsAndMovies {
         System.out.println("Test of: BiFunction<Stream<Actor>, Actor, Stream<Map.Entry<Actor,Actor>>>");
         System.out.println("Display the matching pairs Test:");
         List<Movie> m = new ArrayList<>(movies);
-        Stream actorStream = m.get(2).actors().stream();
+        Stream<Actor> actorStream = m.get(2).actors().stream();
         Stream<Map.Entry<Actor, Actor>> streamOfMapActor = prettyMapActor.apply(actorStream, mostSeenActor);
         streamOfMapActor.forEach((s -> System.out.println("(" + s.getKey() + " , " + s.getValue() + ")")));
         System.out.println("=========================================================");
