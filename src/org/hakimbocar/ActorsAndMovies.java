@@ -201,21 +201,9 @@ public class ActorsAndMovies {
                         .flatMap(movieToActors)
                         .limit(4); // limit to four lines:
 
-        System.out.println("Display the Stream<Map.Entry<Actor, Actor>> pairs:");
+        System.out.println("Display the Stream<Map.Entry<Actor, Actor>> pairs Limit:4");
         entry5MovieToActors.forEach((s -> System.out.println("(" + s.getKey() + " , " + s.getValue() + ")")));
         System.out.println("=========================================================");
-
-
-        Map.Entry<Map.Entry<Actor, Actor>, Long> entry3 =
-                movies.stream()
-                        .flatMap(movieToActors)
-                        .collect(Collectors.groupingBy(
-                                Function.identity(), Collectors.counting()
-                        ))
-                        .entrySet().stream()
-                        .max(Map.Entry.comparingByValue())
-                        .get();
-
 
         // how many pairs of actors can be constructed from this file?
         long numberOfPairs =
@@ -234,6 +222,15 @@ public class ActorsAndMovies {
         System.out.println("The number of unique pairs: " + numberOfUniquePairs);
         System.out.println("=======================================================");
 
+        Map.Entry<Map.Entry<Actor, Actor>, Long> entry3 =
+                movies.stream()
+                        .flatMap(movieToActors)
+                        .collect(Collectors.groupingBy(
+                                Function.identity(), Collectors.counting()
+                        ))
+                        .entrySet().stream()
+                        .max(Map.Entry.comparingByValue())
+                        .get();
 
         // the two actors that played the most together
         Actor oneOfTwoActors = entry3.getKey().getKey();
@@ -265,11 +262,11 @@ public class ActorsAndMovies {
                         .max(Map.Entry.comparingByValue(Map.Entry.comparingByValue()))
                         .get();
 
-        int year = entry.getKey();
+        int year = entry4.getKey();
         Actor actor1ForAYear = entry4.getValue().getKey().getKey();
         Actor actor2ForAYear = entry4.getValue().getKey().getValue();
-        System.out.println(actor1ForAYear + " &" + actor2ForAYear +
-                "\nplayed the most together in Year:" + year);
+        System.out.println(actor1ForAYear + " & " + actor2ForAYear +
+                "\nplayed the most together in " + year);
         System.out.println("=======================================================");
 
     }
