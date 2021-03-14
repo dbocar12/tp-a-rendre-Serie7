@@ -39,7 +39,7 @@ public class ActorsAndMovies {
 
         /* Question 3 :  How many release years in this file ? */
         long numberOfReleaseYears = movies.stream().map(Movie::releaseYear).distinct().count();
-        System.out.println("number of release years: " + numberOfReleaseYears);
+        System.out.println("Number of release years: " + numberOfReleaseYears);
         System.out.println("=======================================================");
 
         /* Question 4 :  Find the earliest release year and the latest */
@@ -47,7 +47,7 @@ public class ActorsAndMovies {
         int earliestYear = statistics.getMin();
         int latestYear = statistics.getMax();
         System.out.println("The earliest year: " + earliestYear);
-        System.out.println("The latest year: " + latestYear);
+        System.out.println("The latest year  : " + latestYear);
         System.out.println("=======================================================");
 
 
@@ -61,8 +61,8 @@ public class ActorsAndMovies {
 
         int yearWithTheGreatestNumberOfMovies = numberOfMoviesPerYear.getKey();
         long numberOfMoviesInThisYear = numberOfMoviesPerYear.getValue();
-        System.out.println("Year with the greatest number of movies: " + yearWithTheGreatestNumberOfMovies);
-        System.out.println("The greatest number of movies: " + numberOfMoviesInThisYear);
+        System.out.println("Year with the greatest number of released movies: " + yearWithTheGreatestNumberOfMovies);
+        System.out.println("The number of movies released: " + numberOfMoviesInThisYear);
         System.out.println("=======================================================");
 
 
@@ -74,8 +74,7 @@ public class ActorsAndMovies {
         String titleOfTheMovieWithTheGreatestNumActors = movieWithGreatestNumberOfActors.title();
         System.out.println("Movie with the greatest # actors: " + titleOfTheMovieWithTheGreatestNumActors);
         System.out.println("Number of actors: " + greatestNumberOfActors);
-        System.out.println("==================================================");
-
+        System.out.println("=======================================================");
 
         /* Question 7 :  Which actor has played in the most movies? */
         // actor that played in the greatest number of movies
@@ -90,10 +89,9 @@ public class ActorsAndMovies {
 
         Actor actorPlayedInTheGreatestNumberOfMovies = actorPerMovie.getKey();
         long numberOfMoviePlayedByThatActor = actorPerMovie.getValue();
-        System.out.println(actorPlayedInTheGreatestNumberOfMovies + " played in \nthe most movies.");
+        System.out.println(actorPlayedInTheGreatestNumberOfMovies + " played in the most movies.");
         System.out.println("He played in " + numberOfMoviePlayedByThatActor + " movies.");
         System.out.println("=======================================================");
-
 
         /* Question 8 : Let's answer the question 7 by using only one collector.
          * Use then this collector to determine which actor has played in the
@@ -127,7 +125,7 @@ public class ActorsAndMovies {
         Actor mostSeenActor = entry.getValue().getKey();
         long numberOfMoviePlayed = entry.getValue().getValue();
 
-        System.out.println(mostSeenActor + " played in \nthe most movies in the year " + whichYear);
+        System.out.println(mostSeenActor + " played in the most movies in One Year.\nIt was in: " + whichYear);
         System.out.println("He played in " + numberOfMoviePlayed + " movies.");
         System.out.println("=======================================================");
 
@@ -136,31 +134,76 @@ public class ActorsAndMovies {
          * all the actors who have played together.
          * */
 
+        /* Question 9.a
+         * Create Comparator of Actor , which compares actors by last name, then by first name.
+         * We will use this comparator in the following, to create only sorted pairs.
+         */
         Comparator<Actor> cmpActor = Comparator.comparing(Actor::lastName).thenComparing(Actor::firstName);
 
-        BiFunction<Movie, Actor, Stream<Map.Entry<Actor, Actor>>> ourMap =
-                (movie, actor1) -> movie.actors().stream()
+
+        /* Question 9.b
+         * First create a BiFunction <Stream <Actor>, Actor,Stream<Map.Entry <Actor, Actor >>>
+         * which takes as parameter a Stream <Actor> and an Actor, and returns
+         * the matching pairs.
+         * For example, for the stream {A, B, C} and for actor D,
+         * it will return (A, D), (B, D) and (C, D) in a stream.
+         */
+
+        BiFunction<Stream<Actor>, Actor, Stream<Map.Entry<Actor, Actor>>> prettyMapActor =
+                (streamActor, actor1) -> streamActor
                         .filter(actor2 -> cmpActor.compare(actor2, actor1) < 0)
                         .map(actor2 -> Map.entry(actor2, actor1));
 
-        /*
-         * Arrays.stream(ourMap.apply(movieWithGreatestNumberOfActors, mostSeenActor).toArray()).forEach((s) ->
-         *       System.out.println(s));
+        // Let's make a test
+        System.out.println("Test of: BiFunction<Stream<Actor>, Actor, Stream<Map.Entry<Actor,Actor>>>");
+        System.out.println("Display the matching pairs Test:");
+        List<Movie> m = new ArrayList<>(movies);
+        Stream actorStream = m.get(2).actors().stream();
+        Stream<Map.Entry<Actor, Actor>> streamOfMapActor = prettyMapActor.apply(actorStream, mostSeenActor);
+        streamOfMapActor.forEach((s -> System.out.println("(" + s.getKey() + " , " + s.getValue() + ")")));
+        System.out.println("=========================================================");
+
+
+        /* Question 9.c
+         * Then create a Function <Movie, Stream <Actor>> which returns the stream of
+         * actors who play in this movie.
+         */
+        Function<Movie, Stream<Actor>> myMovieToActors =
+                movie -> movie.actors().stream();
+
+        // Let's make a test: display the values of Stream<Actor>
+        Stream<Actor> testActor = myMovieToActors.apply(m.get(1)); // m.get(1) : take the second movie on the List<Movie> m
+        System.out.println("Test of: Function<Movie, Stream<Actor>>\nDisplay the stream of actors who play in : " + m.get(1).title());
+        testActor.forEach((System.out::println));
+        System.out.println("=========================================================");
+
+        /* Question 9.d
+         * So we can deduce a BiFunction <Movie, Actor, Stream<Map.Entry <Actor, Actor >>>
+         * which takes a movie and an actor and return the stream of the corresponding actor pairs.
+         */
+
+        BiFunction<Movie, Actor, Stream<Map.Entry<Actor, Actor>>> ourMapMovieAndActorToStreamOfActorPairs =
+                (movie, actor1) -> prettyMapActor.apply(movie.actors().stream(), actor1);
+
+
+        /* Question 9.e
+         * Deduce a Function <Movie, Stream<Map.Entry <Actor, Actor >> which takes a
+         * movie as a parameter and returns the stream of the actor pairs in that movie.
          */
 
         Function<Movie, Stream<Map.Entry<Actor, Actor>>> movieToActors =
                 movie -> movie.actors().stream()
-                        .flatMap(actor -> ourMap.apply(movie, actor));
+                        .flatMap(actor -> ourMapMovieAndActorToStreamOfActorPairs.apply(movie, actor));
 
-
-        // Let's seen what's going on : (O_0)
-        Stream<Map.Entry<Actor, Actor>> entry5 =
+        // Let's take a look by creating Stream<Map.Entry<Actor, Actor>> and display its values
+        Stream<Map.Entry<Actor, Actor>> entry5MovieToActors =
                 movies.stream()
                         .flatMap(movieToActors)
-                        .limit(4);
+                        .limit(4); // limit to four lines:
 
-        Arrays.stream(entry5.toArray()).forEach(System.out::println);
-        System.out.println("=======================================================");
+        System.out.println("Display the Stream<Map.Entry<Actor, Actor>> pairs:");
+        entry5MovieToActors.forEach((s -> System.out.println("(" + s.getKey() + " , " + s.getValue() + ")")));
+        System.out.println("=========================================================");
 
 
         Map.Entry<Map.Entry<Actor, Actor>, Long> entry3 =
@@ -223,12 +266,10 @@ public class ActorsAndMovies {
                         .get();
 
         int year = entry.getKey();
-        long numberOfActorWhoPlayedTheMostTogetherForAYear = entry.getValue().getValue();
         Actor actor1ForAYear = entry4.getValue().getKey().getKey();
         Actor actor2ForAYear = entry4.getValue().getKey().getValue();
-        System.out.println("The number of actors who played\nthe most together for a year: " + numberOfActorWhoPlayedTheMostTogetherForAYear);
-        System.out.println("In Year: " + year);
-        System.out.println(actor1ForAYear + " \n" + actor2ForAYear + "\nThey played the most together");
+        System.out.println(actor1ForAYear + " &" + actor2ForAYear +
+                "\nplayed the most together in Year:" + year);
         System.out.println("=======================================================");
 
     }
